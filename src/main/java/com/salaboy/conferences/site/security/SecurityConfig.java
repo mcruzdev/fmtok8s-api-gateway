@@ -2,6 +2,7 @@ package com.salaboy.conferences.site.security;
 
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,6 +18,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Profile("prod")
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
