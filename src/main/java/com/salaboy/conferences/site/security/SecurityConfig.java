@@ -1,11 +1,7 @@
 package com.salaboy.conferences.site.security;
 
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Profile;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,33 +12,16 @@ import org.springframework.security.oauth2.client.userinfo.ReactiveOAuth2UserSer
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Profile("prod")
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
-
-    @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
-    private String issuerUri;
-
-    @Value("${spring.security.oauth2.client.registration.oidc.client-id}")
-    private String clientId;
-
-    @Value("${spring.security.oauth2.client.registration.oidc.client-secret}")
-    private String clientSecret;
-
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
-
-        System.out.println("Issuer URI: " + issuerUri);
-        System.out.println("Client ID: " + clientId);
-        System.out.println("Client Secret: " + clientSecret);
-
 
         return http.csrf().disable()
                 .authorizeExchange()
@@ -55,22 +34,6 @@ public class SecurityConfig {
                 .and()
                 .build();
     }
-
-    static class GrantedAuthoritiesExtractor implements Converter<Jwt, Collection<GrantedAuthority>> {
-
-        @Override
-        public Collection<GrantedAuthority> convert(Jwt jwt) {
-
-            @SuppressWarnings("unchecked")
-            var roles = (List<String>) jwt.getClaims().getOrDefault("groups", Collections.emptyList());
-
-            return roles.stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toList());
-        }
-    }
-
-
 
     @Bean
     public ReactiveOAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
@@ -94,12 +57,7 @@ public class SecurityConfig {
     }
 
     public static List<GrantedAuthority> extractAuthorityFromClaims(Map<String, Object> claims) {
-        List<GrantedAuthority> grantedAuthorities = mapRolesToGrantedAuthorities(getRolesFromClaims(claims));
-        for(GrantedAuthority ga : grantedAuthorities){
-            System.out.println("> GrantedAuthority: " + ga.getAuthority());
-        }
-
-        return grantedAuthorities;
+        return mapRolesToGrantedAuthorities(getRolesFromClaims(claims));
     }
 
     @SuppressWarnings("unchecked")
