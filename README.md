@@ -47,4 +47,4 @@ Cloud Event received for Customer to Exit the Queue from Queue Service
 ```
 curl -X POST http://localhost:8080/default/default -H "Content-Type: application/json" -H "ce-type: Queue.CustomerExited"  -H "ce-id: 123"  -H "ce-specversion: 1.0" -H "ce-source: curl-command" -d '{"sessionId" : "123" }'
 ```
-
+GithubActions
